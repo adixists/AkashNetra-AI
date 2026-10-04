@@ -63,10 +63,10 @@ bust:
   percentile: 90
   # Minimum train samples per (box, lead_day) group needed to estimate a threshold.
   min_samples_per_group: 30
-  # Whether thresholds are computed per lead day. The spec says "per box and season";
-  # error grows with lead, so per-lead pooling would make long leads bust far more often
-  # than 10%. Kept configurable; the choice is documented in docs/ARCHITECTURE.md.
+  # Whether thresholds are computed per lead day.
   per_lead_day: true
+  # Minimum absolute error floor [mm]; avoids flagging trivial errors as busts.
+  min_error_floor_mm: 5.0
 
 # Real-data settings. Everything here is a hypothesis to be VERIFIED in M6
 # (see docs/DATA_NOTES.md); nothing below has been confirmed against the bucket yet.

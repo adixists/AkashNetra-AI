@@ -209,6 +209,7 @@ class BustConfig(_Strict):
     percentile: float = Field(default=90.0, gt=0, lt=100)
     min_samples_per_group: int = Field(default=30, ge=2)
     per_lead_day: bool = True
+    min_error_floor_mm: float = Field(default=5.0, ge=0.0)
 
 
 class GEFSConfig(_Strict):

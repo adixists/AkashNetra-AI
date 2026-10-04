@@ -63,7 +63,10 @@ def compute_bust_thresholds(
     if train.empty:
         raise LabelError("No training rows available to compute bust thresholds")
     grouped = train.groupby(keys, observed=True, sort=True)["abs_error"]
-    out = grouped.quantile(bust.percentile / 100.0).rename("threshold").to_frame()
+    q = grouped.quantile(bust.percentile / 100.0)
+    if bust.min_error_floor_mm > 0:
+        q = np.maximum(q, float(bust.min_error_floor_mm))
+    out = q.rename("threshold").to_frame()
     out["n_train"] = grouped.size()
     out = out.reset_index()
     too_small = out[out["n_train"] < bust.min_samples_per_group]
@@ -114,6 +117,7 @@ def save_thresholds(
     meta: dict[str, Any] = {
         "percentile": bust.percentile,
         "per_lead_day": bust.per_lead_day,
+        "min_error_floor_mm": bust.min_error_floor_mm,
         "group_keys": group_keys(bust.per_lead_day),
         "min_samples_per_group": bust.min_samples_per_group,
         "train_years": list(train_years),

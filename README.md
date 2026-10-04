@@ -20,7 +20,7 @@
 
 <br/>
 
-*“AkashNetra” (Celestial Eye) is an operational post-processing intelligence layer that sits downstream of Numerical Weather Prediction (NWP) systems (IMD/NCMRWF NCUM & NEPS, NOAA GEFS v12). It estimates, for every 1°×1° spatial box across lead days 1–10, the probability of an extreme rainfall forecast bust — accompanied by SHAP physical drivers, historical analog cases, and meteorological sanity checks.*
+*“AkashNetra” (Celestial Eye) is an operational post-processing intelligence layer that sits downstream of Numerical Weather Prediction (NWP) systems (IMD/NCMRWF NCUM & NEPS, NOAA GEFS v12). It estimates, for every 1°×1° spatial box across lead days 1–10, the probability of a severe rainfall forecast bust (errors in the top 10% of historical forecasts) — accompanied by SHAP physical drivers, historical analog cases, and meteorological sanity checks.*
 
 > ⚠️ **Disclaimer:** *AkashNetra AI is an analytical research prototype for NWP uncertainty estimation; it does not replace official meteorological agency alerts or operational IMD bulletins.*
 
@@ -42,18 +42,22 @@ Numerical Weather Prediction (NWP) models have advanced dramatically, yet convec
 
 ## 📐 The Bust Definition
 
-A **forecast bust** is defined with zero data leakage:
+A **forecast bust** is defined using a **leakage-controlled** methodology:
 
 $$\text{Error}(d, t, b) = \left| \overline{R}_{\text{fcst}}(d, t, b) - R_{\text{obs}}(t+d, b) \right|$$
 
-$$\text{Bust}(d, t, b) = \begin{cases} 1 & \text{if } \text{Error}(d, t, b) \ge Q_{0.90}(b, \text{season}) \\ 0 & \text{otherwise} \end{cases}$$
+$$T(b, d, \text{season}) = \max\left( Q_{0.90}(b, d, \text{season}), \epsilon_{\text{floor}} \right)$$
+
+$$\text{Bust}(d, t, b) = \begin{cases} 1 & \text{if } \text{Error}(d, t, b) > T(b, d, \text{season}) \\ 0 & \text{otherwise} \end{cases}$$
 
 Where:
-* **Spatial unit:** $1^\circ \times 1^\circ$ grid cells over the pilot region (Central India: $15^\circ\text{N} - 25^\circ\text{N}$, $74^\circ\text{E} - 88^\circ\text{E}$, 140 boxes).
+* **Spatial unit ($b$):** $1^\circ \times 1^\circ$ grid cells over the pilot region (Central India: $15^\circ\text{N} - 25^\circ\text{N}$, $74^\circ\text{E} - 88^\circ\text{E}$, 140 boxes).
+* **Lead day ($d$):** Lead times $d \in \{1, 2, \dots, 10\}$ (24 h accumulated rainfall).
 * **Forecast:** Ensemble-mean 24 h accumulated rainfall $\overline{R}_{\text{fcst}}$.
 * **Observation:** IMD $0.25^\circ$ gridded daily rainfall regridded conservatively to $1^\circ \times 1^\circ$.
-* **Threshold Computation:** The 90th percentile threshold $Q_{0.90}$ is computed **strictly on training years only** and frozen into an artifact. It is never recalculated on validation or test years.
-* **Expected Base Rate:** By formulation, ~10% of samples are busts. A random guesser scores $\text{PR-AUC} \approx 0.10$.
+* **Threshold Computation:** The 90th percentile threshold $Q_{0.90}(b, d, \text{season})$ is computed per box $b$ and per lead day $d$ **strictly on training years only** and frozen into an artifact. It is applied unchanged to validation and test years.
+* **Minimum-Error Floor ($\epsilon_{\text{floor}}$):** An absolute error floor (default $5.0\text{ mm}$) ensures that trivial errors in dry boxes or low-rain conditions are not classified as high-impact busts.
+* **Expected Base Rate:** By construction, ~10% of training samples are busts, establishing a random predictor baseline of $\text{PR-AUC} \approx 0.10$.
 
 ---
 
@@ -190,7 +194,7 @@ akashnetra/
 │   ├── explain/                  # TreeSHAP, physics rule checks, plain-language text
 │   ├── api/                      # FastAPI endpoints returning GeoJSON FeatureCollections
 │   └── dashboard/                # Operational Streamlit console and components
-├── tests/                        # Comprehensive pytest test suite (17+ unit & regression tests)
+├── tests/                        # Comprehensive pytest test suite (27 unit & regression tests)
 ├── .env.example                  # Environment secrets template
 ├── .gitignore                    # Robust gitignore (protects large data & artifacts)
 ├── config.yaml                   # Central project configuration
@@ -227,7 +231,7 @@ pip install -e . --no-deps
 ### 2. Verify Installation & Run End-to-End Demo
 
 ```bash
-# Run pytest verification suite (all 26 tests pass out of the box)
+# Run pytest verification suite (all 27 tests pass out of the box)
 python scripts/tasks.py test
 
 # Check code formatting & linting
@@ -246,7 +250,7 @@ python scripts/tasks.py demo
 | Milestone | Deliverables | Status |
 |:---:|:---|:---:|
 | **M0** | Repository scaffold, typed config validation, logging, cross-platform tooling, Docker skeleton | **COMPLETED ✅** |
-| **M1** | Synthetic DEMO MODE source generator, 1°×1° box grid, conservative regridding, QC filter, train-only 90th percentile bust labeller, zero leakage verification | **COMPLETED ✅** |
+| **M1** | Synthetic DEMO MODE source generator, 1°×1° box grid, conservative regridding, QC filter, train-only 90th percentile bust labeller with minimum-error floor, leakage-controlled evaluation | **COMPLETED ✅** |
 | **M2** | Physics features (shear, moisture flux anomaly), kNN analog library, LightGBM/XGBoost, isotonic calibration, baseline comparisons | *In Progress 🔄* |
 | **M3** | TreeSHAP driver attribution, historical case evidence, meteorological sanity checks, reason generator | *Upcoming ⏳* |
 | **M4** | FastAPI endpoints serving standards-compliant GeoJSON alert collections | *Upcoming ⏳* |

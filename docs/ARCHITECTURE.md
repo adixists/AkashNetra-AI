@@ -27,7 +27,7 @@ flowchart LR
 | Decision | Why |
 |---|---|
 | Thresholds computed on train years only, stored as an artifact | Prevents leakage into val/test |
-| Bust threshold per (box, lead day) within the season (`bust.per_lead_day: true`) | Spec says "per box per season"; errors grow with lead, so pooling leads would make long leads bust far more than 10%. Configurable; revisit if you prefer pooling. |
+| Bust threshold per (box, lead day) within the season with minimum-error floor (`bust.per_lead_day: true`, `bust.min_error_floor_mm: 5.0`) | Errors grow with lead, so per-lead thresholds prevent long leads from dominating bust counts. The minimum floor prevents trivial errors in dry or low-rain conditions from triggering false busts. |
 | Season assigned by init date | A forecast issued 30 Sep stays in JJAS even if it verifies in October |
 | No automatic fallback from real to synthetic data | Honesty rule; `data_mode` is explicit and surfaced in API/UI |
 | Dev split 3/1/1 years vs full 15/2/3 | Proportional scaling for the 5-year dev subset; see `config.yaml` |
