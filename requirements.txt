@@ -1,0 +1,35 @@
+# Core runtime dependencies (pinned). Python 3.11+.
+# Justification for anything beyond the spec's stack:
+#   pyarrow  - Parquet I/O (spec: "tidy Parquet table")
+#   scipy    - required by scikit-learn / isotonic + interpolation
+#   zarr     - chunked cache format (spec: Zarr or NetCDF)
+#   joblib   - model/calibrator serialisation
+#   matplotlib - saved reliability-plot PNG artifact (M2)
+#   pydantic / PyYAML / python-dotenv - typed config + .env secrets
+#   requests/httpx/tenacity - dashboard->API calls, retries on downloads
+numpy==2.1.3
+pandas==2.2.3
+scipy==1.14.1
+pyarrow==18.1.0
+xarray==2024.11.0
+netCDF4==1.7.2
+dask==2024.11.2
+zarr==2.18.3
+scikit-learn==1.5.2
+lightgbm==4.5.0
+xgboost==2.1.3
+shap==0.46.0
+joblib==1.4.2
+matplotlib==3.9.2
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic==2.10.2
+httpx==0.27.2
+requests==2.32.3
+tenacity==9.0.0
+streamlit==1.40.2
+folium==0.18.0
+streamlit-folium==0.23.2
+plotly==5.24.1
+PyYAML==6.0.2
+python-dotenv==1.0.1

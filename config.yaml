@@ -1,0 +1,115 @@
+# AkashNetra AI: central configuration.
+# Every key here is validated by src/akashnetra/config.py (unknown keys are rejected).
+# Environment overrides: AKASHNETRA_CONFIG (path to this file), AKASHNETRA_DATA_MODE,
+# AKASHNETRA_API_URL. Secrets live in .env, never here.
+
+project:
+  name: "AkashNetra AI: Forecast Bust Predictor"
+  model_version: "0.1.0-dev"
+
+# "synthetic" -> SyntheticSource (DEMO MODE, always labelled "SYNTHETIC DEMO DATA").
+# "real"      -> GEFS reforecast + IMD observations (labelled "REAL DATA (GEFS proxy)").
+# There is NO automatic fallback between the two: if "real" data is missing, the
+# pipeline raises an error instead of silently switching to synthetic data.
+data_mode: synthetic
+
+paths:
+  data_dir: data            # relative to project root (gitignored)
+  artifacts_dir: artifacts  # relative to project root (gitignored)
+
+# Pilot region (Phase 1: central India). Edges must be integer multiples of box_size_deg.
+region:
+  lat_min: 15.0
+  lat_max: 25.0
+  lon_min: 74.0
+  lon_max: 88.0
+  box_size_deg: 1.0
+
+# Season used for bust thresholds (Phase 1: monsoon, JJAS).
+season:
+  name: JJAS
+  months: [6, 7, 8, 9]
+  # Which date decides the season of a (init_date, lead_day) sample.
+  # "init_date": a forecast issued on 30 Sep that verifies on 10 Oct stays in JJAS.
+  assign_by: init_date
+
+years:
+  # "dev" -> fast development subset, "full" -> final run.
+  active: dev
+  dev_years: {start: 2015, end: 2019}
+  full_years: {start: 2000, end: 2019}
+  # Chronological, non-overlapping splits by YEAR (never by random row).
+  # full: 15 / 2 / 3 years (spec defaults).
+  # dev : 5 years only, so the split is scaled down proportionally while keeping at
+  #       least one year per split: 3 / 1 / 1 years (train 60%, val 20%, test 20%
+  #       versus 75% / 10% / 15% in the full run). Small val/test sets mean noisy
+  #       dev metrics; only the full run should be quoted as evidence.
+  split:
+    full:
+      train: {start: 2000, end: 2014}
+      val: {start: 2015, end: 2016}
+      test: {start: 2017, end: 2019}
+    dev:
+      train: {start: 2015, end: 2017}
+      val: {start: 2018, end: 2018}
+      test: {start: 2019, end: 2019}
+
+forecast:
+  max_lead_day: 10   # lead days 1..max_lead_day, each a 24 h accumulation
+
+bust:
+  # Bust = abs error above this percentile of the box's errors in the season.
+  # Thresholds are computed on TRAIN years only and then frozen (artifact file).
+  percentile: 90
+  # Minimum train samples per (box, lead_day) group needed to estimate a threshold.
+  min_samples_per_group: 30
+  # Whether thresholds are computed per lead day. The spec says "per box and season";
+  # error grows with lead, so per-lead pooling would make long leads bust far more often
+  # than 10%. Kept configurable; the choice is documented in docs/ARCHITECTURE.md.
+  per_lead_day: true
+
+# Real-data settings. Everything here is a hypothesis to be VERIFIED in M6
+# (see docs/DATA_NOTES.md); nothing below has been confirmed against the bucket yet.
+gefs:
+  bucket: noaa-gefs-retrospective
+  anonymous: true
+  max_retries: 5
+  retry_backoff_seconds: 2.0
+  variables: [apcp, hgt_500, spfh_850, ugrd_850, vgrd_850, ugrd_200, vgrd_200, tmp_2m]
+
+features:
+  analogs:
+    k: 10   # nearest past forecasts, same lead day, TRAIN years only
+
+model:
+  seed: 42
+  calibration: isotonic        # isotonic | platt (fitted on the validation years)
+  tuning_trials: 0             # 0 = no tuning, fixed params below
+  early_stopping_rounds: 50
+  lightgbm:
+    n_estimators: 600
+    learning_rate: 0.03
+    num_leaves: 31
+    min_child_samples: 50
+    subsample: 0.8
+    colsample_bytree: 0.8
+  xgboost:
+    n_estimators: 600
+    learning_rate: 0.03
+    max_depth: 6
+    subsample: 0.8
+    colsample_bytree: 0.8
+
+alerts:
+  # Alert threshold is chosen on the validation years: maximise recall subject to
+  # precision >= precision_target. Stored as an artifact; the dashboard can override it.
+  precision_target: 0.5
+
+api:
+  host: 0.0.0.0
+  port: 8000
+  cors_origins: ["http://localhost:8501", "http://127.0.0.1:8501"]
+
+dashboard:
+  api_url: http://localhost:8000
+  port: 8501

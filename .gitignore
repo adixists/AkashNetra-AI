@@ -1,0 +1,22 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# Large / generated (recreate with make demo | make data | make train)
+data/
+artifacts/
+
+# Keep docs screenshots and assets
+!docs/screenshots/
+!docs/assets/

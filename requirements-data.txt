@@ -1,0 +1,8 @@
+# Real-data extras (M6). Kept separate because GRIB/CDS/S3 tooling is heavy and not
+# needed for DEMO MODE. Install with:  pip install -r requirements-data.txt
+cfgrib==0.9.14.1
+eccodes==2.38.3
+s3fs==2024.10.0
+fsspec==2024.10.0
+imdlib==0.1.17
+cdsapi==0.7.5
