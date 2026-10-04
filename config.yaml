@@ -81,6 +81,11 @@ features:
   analogs:
     k: 10   # nearest past forecasts, same lead day, TRAIN years only
 
+# DEMO MODE generator (data_mode: synthetic). Generated data is NOT real weather.
+synthetic:
+  n_members: 11        # ensemble members per synthetic forecast
+  fine_res_deg: 0.25   # resolution of the synthetic "truth" field, regridded to boxes
+
 model:
   seed: 42
   calibration: isotonic        # isotonic | platt (fitted on the validation years)

@@ -12,7 +12,7 @@
 [![LightGBM](https://img.shields.io/badge/ML-LightGBM%20%7C%20XGBoost-brightgreen.svg)](https://lightgbm.readthedocs.io/)
 [![SHAP](https://img.shields.io/badge/Explainability-TreeSHAP-orange.svg)](https://shap.readthedocs.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Status: Prototype](https://img.shields.io/badge/Status-Milestone%20M0%20Verified-success.svg)]()
+[![Status: Prototype](https://img.shields.io/badge/Status-Milestones%20M0%20%26%20M1%20Verified-success.svg)]()
 
 <br/>
 
@@ -224,17 +224,20 @@ pip install -r requirements.txt -r requirements-dev.txt
 pip install -e . --no-deps
 ```
 
-### 2. Verify Installation & Configuration
+### 2. Verify Installation & Run End-to-End Demo
 
 ```bash
-# Run pytest verification suite (all 17 tests pass out of the box)
+# Run pytest verification suite (all 26 tests pass out of the box)
 python scripts/tasks.py test
 
 # Check code formatting & linting
 python scripts/tasks.py lint
+
+# Run Milestone M1 End-to-End Synthetic Demo (generates 854k rows + train thresholds)
+python scripts/tasks.py demo
 ```
 
-*(On Linux / macOS systems with `make` installed, you can simply run `make test` and `make lint`)*
+*(On Linux / macOS systems with `make` installed, you can simply run `make test`, `make lint`, and `make demo`)*
 
 ---
 
@@ -243,8 +246,8 @@ python scripts/tasks.py lint
 | Milestone | Deliverables | Status |
 |:---:|:---|:---:|
 | **M0** | Repository scaffold, typed config validation, logging, cross-platform tooling, Docker skeleton | **COMPLETED ✅** |
-| **M1** | Synthetic source generator, $1^\circ$ box grid tiling, train-only 90th percentile bust labeller | *In Progress 🔄* |
-| **M2** | Physics features, kNN analog library, LightGBM/XGBoost, isotonic calibration, baseline comparisons | *Upcoming ⏳* |
+| **M1** | Synthetic DEMO MODE source generator, 1°×1° box grid, conservative regridding, QC filter, train-only 90th percentile bust labeller, zero leakage verification | **COMPLETED ✅** |
+| **M2** | Physics features (shear, moisture flux anomaly), kNN analog library, LightGBM/XGBoost, isotonic calibration, baseline comparisons | *In Progress 🔄* |
 | **M3** | TreeSHAP driver attribution, historical case evidence, meteorological sanity checks, reason generator | *Upcoming ⏳* |
 | **M4** | FastAPI endpoints serving standards-compliant GeoJSON alert collections | *Upcoming ⏳* |
 | **M5** | Streamlit operational console (interactive choropleth, D1–D10 tiles, diagnostic breakdown) | *Upcoming ⏳* |

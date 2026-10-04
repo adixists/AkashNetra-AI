@@ -25,6 +25,12 @@ ENV_API_URL = "AKASHNETRA_API_URL"
 DataMode = Literal["synthetic", "real"]
 SplitName = Literal["train", "val", "test"]
 
+# Human-readable labels shown in the API and dashboard for every data mode.
+DATA_MODE_LABELS: dict[str, str] = {
+    "synthetic": "SYNTHETIC DEMO DATA",
+    "real": "REAL DATA (GEFS proxy)",
+}
+
 
 class ConfigError(ValueError):
     """Raised when the configuration file is missing or invalid."""
@@ -230,6 +236,13 @@ class ModelConfig(_Strict):
     xgboost: dict[str, Any] = Field(default_factory=dict)
 
 
+class SyntheticConfig(_Strict):
+    """Settings of the DEMO MODE generator (only used when data_mode == synthetic)."""
+
+    n_members: int = Field(default=11, ge=2)
+    fine_res_deg: float = Field(default=0.25, gt=0)
+
+
 class AlertsConfig(_Strict):
     precision_target: float = Field(default=0.5, gt=0, le=1)
 
@@ -261,6 +274,7 @@ class AppConfig(_Strict):
     bust: BustConfig = BustConfig()
     gefs: GEFSConfig
     features: FeaturesConfig = FeaturesConfig()
+    synthetic: SyntheticConfig = SyntheticConfig()
     model: ModelConfig = ModelConfig()
     alerts: AlertsConfig = AlertsConfig()
     api: ApiConfig = ApiConfig()
@@ -268,6 +282,30 @@ class AppConfig(_Strict):
 
     # Set by load_config(); not part of the YAML schema.
     root: Path = Field(default=Path("."), exclude=True)
+
+    @model_validator(mode="after")
+    def _check_fine_grid(self) -> AppConfig:
+        n = self.region.box_size_deg / self.synthetic.fine_res_deg
+        if abs(n - round(n)) > 1e-9:
+            raise ValueError(
+                "region.box_size_deg must be a whole multiple of synthetic.fine_res_deg"
+            )
+        return self
+
+    @property
+    def data_label(self) -> str:
+        """Banner text for the active data mode."""
+        return DATA_MODE_LABELS[self.data_mode]
+
+    @property
+    def processed_dir(self) -> Path:
+        """Processed-data directory; separate per data mode so outputs never mix."""
+        return self.data_dir / "processed" / self.data_mode
+
+    @property
+    def model_artifacts_dir(self) -> Path:
+        """Artifact directory; separate per data mode so outputs never mix."""
+        return self.artifacts_dir / self.data_mode
 
     @property
     def data_dir(self) -> Path:
