@@ -16,13 +16,14 @@ def test_no_label_columns_in_features():
     with pytest.raises(ValueError, match="Label columns used as features"):
         check_no_label_features(["obs_rain"])
 
+
 def test_feature_climatology_train_only():
     df = pd.DataFrame(
         {
             "init_date": pd.date_range("2015-01-01", periods=3),
             "lead_day": [1, 1, 1],
             "box_id": ["B1", "B2", "B3"],
-            "year": [2015, 2016, 2017], # mixing years
+            "year": [2015, 2016, 2017],  # mixing years
             "fcst_rain_spread": [0.1, 0.2, 0.3],
             "moisture_flux_850": [1, 2, 3],
             "z500": [10, 20, 30],
@@ -30,7 +31,7 @@ def test_feature_climatology_train_only():
             "region_rain_z": [0, 0, 0],
             "lat": [15, 16, 17],
             "lon": [75, 76, 77],
-            "fcst_rain_mean": [1, 2, 3]
+            "fcst_rain_mean": [1, 2, 3],
         }
     )
 

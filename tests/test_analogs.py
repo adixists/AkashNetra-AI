@@ -11,7 +11,7 @@ def test_analog_leakage_on_fit():
             "valid_date": pd.date_range("2015-01-02", periods=3),
             "lead_day": [1, 1, 1],
             "box_id": ["B1", "B2", "B3"],
-            "year": [2015, 2016, 2017], # mixing years
+            "year": [2015, 2016, 2017],  # mixing years
             "fcst_rain_mean": [1.0, 2.0, 3.0],
             "fcst_rain_spread": [0.1, 0.2, 0.3],
             "obs_rain": [1.0, 2.0, 3.0],
@@ -28,9 +28,11 @@ def test_analog_leakage_on_fit():
 
     # Should work if we only ask for 2015 and 2016 as train years
     # Wait, k=1 will fail if len(grp) <= k, we need at least 2 rows per lead for k=1
-    df2 = pd.concat([df]*2, ignore_index=True)
-    df2["lead_day"] = [1, 1, 1, 2, 2, 2] # 3 rows per lead, one for each year
-    df3 = pd.concat([df2]*3, ignore_index=True) # 9 rows per lead: 3 of 2015, 3 of 2016, 3 of 2017
+    df2 = pd.concat([df] * 2, ignore_index=True)
+    df2["lead_day"] = [1, 1, 1, 2, 2, 2]  # 3 rows per lead, one for each year
+    df3 = pd.concat(
+        [df2] * 3, ignore_index=True
+    )  # 9 rows per lead: 3 of 2015, 3 of 2016, 3 of 2017
 
     # This should pass because we explicitly pass train_years=[2015, 2016]
     # And it filters internally. Wait, the fit method filters df by train_years.
@@ -48,6 +50,7 @@ def test_analog_leakage_on_fit():
     # ids contains indices into index.library
     analog_years = index.library.loc[ids.flatten(), "year"].values
     assert 2015 not in analog_years
+
 
 def test_analog_leakage_error_internal():
     # Test assert_library_clean directly

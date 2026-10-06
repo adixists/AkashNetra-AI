@@ -252,8 +252,8 @@ python scripts/tasks.py demo
 | **M0** | Repository scaffold, typed config validation, logging, cross-platform tooling, Docker skeleton | **COMPLETED ✅** |
 | **M1** | Synthetic DEMO MODE source generator, 1°×1° box grid, conservative regridding, QC filter, train-only 90th percentile bust labeller with minimum-error floor, leakage-controlled evaluation | **COMPLETED ✅** |
 | **M2** | Physics features (shear, moisture flux anomaly), kNN analog library, LightGBM/XGBoost, isotonic calibration, baseline comparisons | **COMPLETED ✅** |
-| **M3** | TreeSHAP driver attribution, historical case evidence, meteorological sanity checks, reason generator | *In Progress 🔄* |
-| **M4** | FastAPI endpoints serving standards-compliant GeoJSON alert collections | *Upcoming ⏳* |
+| **M3** | TreeSHAP driver attribution, historical case evidence, meteorological sanity checks, reason generator | **COMPLETED ✅** |
+| **M4** | FastAPI endpoints serving standards-compliant GeoJSON alert collections | *In Progress 🔄* |
 | **M5** | Streamlit operational console (interactive choropleth, D1–D10 tiles, diagnostic breakdown) | *Upcoming ⏳* |
 | **M6** | Real-world GEFS v12 reforecast ingestion & IMD gridded observation pipeline | *Upcoming ⏳* |
 | **M7** | Multi-container Docker deployment, system hardening, and final verification | *Upcoming ⏳* |

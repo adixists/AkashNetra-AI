@@ -240,9 +240,7 @@ def run_training(cfg: AppConfig, table: pd.DataFrame | None = None) -> TrainResu
         "lightgbm": {s: lgbm.predict_proba(x)[:, 1] for s, x in (("val", x_va), ("test", x_te))},
         "xgboost": {s: xgbm.predict_proba(x)[:, 1] for s, x in (("val", x_va), ("test", x_te))},
     }
-    calibrators = {
-        m: Calibrator(cfg.model.calibration).fit(raw[m]["val"], y_va) for m in raw
-    }
+    calibrators = {m: Calibrator(cfg.model.calibration).fit(raw[m]["val"], y_va) for m in raw}
     climatology = ClimatologyBaseline().fit(tr["lead_day"], y_tr)
     spread = SpreadLogisticBaseline(seed).fit(tr["fcst_rain_spread"], y_tr)
 
@@ -342,8 +340,7 @@ def run_training(cfg: AppConfig, table: pd.DataFrame | None = None) -> TrainResu
     joblib.dump(xgbm, out_dir / "xgboost.joblib")
     joblib.dump(calibrators, out_dir / "calibrators.joblib")
     joblib.dump(
-        {"climatology": climatology, "spread_logistic": spread},
-        out_dir / "baselines.joblib"
+        {"climatology": climatology, "spread_logistic": spread}, out_dir / "baselines.joblib"
     )
     joblib.dump(clim, out_dir / "feature_climatology.joblib")
     joblib.dump(index, out_dir / "analog_index.joblib")
