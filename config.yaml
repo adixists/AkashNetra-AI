@@ -81,6 +81,15 @@ features:
   analogs:
     k: 10   # nearest past forecasts, same lead day, TRAIN years only
 
+# Rule-based regime tags, computed from FORECAST fields (available at issue time).
+# All values are z-scores against TRAIN-year climatology per (lead_day, month).
+# Proxies only (no ERA5 / SLP vorticity yet); see docs/ARCHITECTURE.md.
+regimes:
+  active_rain_z: 0.5    # region-mean forecast rain z above this -> monsoon_phase = +1 (active)
+  break_rain_z: -0.5    # region-mean forecast rain z below this -> monsoon_phase = -1 (break)
+  lps_z500_z: -1.0      # box 500 hPa height z below this ...
+  lps_moisture_z: 0.5   # ... AND moisture-flux z above this -> lps_flag = 1 (low-pressure proxy)
+
 # DEMO MODE generator (data_mode: synthetic). Generated data is NOT real weather.
 synthetic:
   n_members: 11        # ensemble members per synthetic forecast
@@ -109,6 +118,8 @@ alerts:
   # Alert threshold is chosen on the validation years: maximise recall subject to
   # precision >= precision_target. Stored as an artifact; the dashboard can override it.
   precision_target: 0.5
+  # API level: High = alert (p >= threshold); Medium = p >= medium_fraction * threshold.
+  medium_fraction: 0.5
 
 api:
   host: 0.0.0.0

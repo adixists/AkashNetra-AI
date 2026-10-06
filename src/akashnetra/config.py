@@ -224,6 +224,25 @@ class AnalogConfig(_Strict):
     k: int = Field(default=10, ge=1)
 
 
+class RegimesConfig(_Strict):
+    """Rule-based weather-regime tags (z-scores vs TRAIN-year climatology).
+
+    Computed from forecast fields, i.e. information available at issue time. These are
+    simple, documented proxies, not an operational regime classifier.
+    """
+
+    active_rain_z: float = 0.5
+    break_rain_z: float = -0.5
+    lps_z500_z: float = -1.0
+    lps_moisture_z: float = 0.5
+
+    @model_validator(mode="after")
+    def _check_order(self) -> RegimesConfig:
+        if self.break_rain_z >= self.active_rain_z:
+            raise ValueError("regimes.break_rain_z must be < regimes.active_rain_z")
+        return self
+
+
 class FeaturesConfig(_Strict):
     analogs: AnalogConfig = AnalogConfig()
 
@@ -246,6 +265,9 @@ class SyntheticConfig(_Strict):
 
 class AlertsConfig(_Strict):
     precision_target: float = Field(default=0.5, gt=0, le=1)
+    # Level shown in the API: High = alert (p >= threshold),
+    # Medium = p >= medium_fraction * threshold, Low otherwise.
+    medium_fraction: float = Field(default=0.5, gt=0, lt=1)
 
 
 class ApiConfig(_Strict):
@@ -275,6 +297,7 @@ class AppConfig(_Strict):
     bust: BustConfig = BustConfig()
     gefs: GEFSConfig
     features: FeaturesConfig = FeaturesConfig()
+    regimes: RegimesConfig = RegimesConfig()
     synthetic: SyntheticConfig = SyntheticConfig()
     model: ModelConfig = ModelConfig()
     alerts: AlertsConfig = AlertsConfig()

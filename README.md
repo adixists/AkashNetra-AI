@@ -194,7 +194,7 @@ akashnetra/
 │   ├── explain/                  # TreeSHAP, physics rule checks, plain-language text
 │   ├── api/                      # FastAPI endpoints returning GeoJSON FeatureCollections
 │   └── dashboard/                # Operational Streamlit console and components
-├── tests/                        # Comprehensive pytest test suite (27 unit & regression tests)
+├── tests/                        # Comprehensive pytest test suite (34 unit & regression tests)
 ├── .env.example                  # Environment secrets template
 ├── .gitignore                    # Robust gitignore (protects large data & artifacts)
 ├── config.yaml                   # Central project configuration
@@ -231,7 +231,7 @@ pip install -e . --no-deps
 ### 2. Verify Installation & Run End-to-End Demo
 
 ```bash
-# Run pytest verification suite (all 27 tests pass out of the box)
+# Run pytest verification suite (all 34 tests pass out of the box)
 python scripts/tasks.py test
 
 # Check code formatting & linting
@@ -251,8 +251,8 @@ python scripts/tasks.py demo
 |:---:|:---|:---:|
 | **M0** | Repository scaffold, typed config validation, logging, cross-platform tooling, Docker skeleton | **COMPLETED ✅** |
 | **M1** | Synthetic DEMO MODE source generator, 1°×1° box grid, conservative regridding, QC filter, train-only 90th percentile bust labeller with minimum-error floor, leakage-controlled evaluation | **COMPLETED ✅** |
-| **M2** | Physics features (shear, moisture flux anomaly), kNN analog library, LightGBM/XGBoost, isotonic calibration, baseline comparisons | *In Progress 🔄* |
-| **M3** | TreeSHAP driver attribution, historical case evidence, meteorological sanity checks, reason generator | *Upcoming ⏳* |
+| **M2** | Physics features (shear, moisture flux anomaly), kNN analog library, LightGBM/XGBoost, isotonic calibration, baseline comparisons | **COMPLETED ✅** |
+| **M3** | TreeSHAP driver attribution, historical case evidence, meteorological sanity checks, reason generator | *In Progress 🔄* |
 | **M4** | FastAPI endpoints serving standards-compliant GeoJSON alert collections | *Upcoming ⏳* |
 | **M5** | Streamlit operational console (interactive choropleth, D1–D10 tiles, diagnostic breakdown) | *Upcoming ⏳* |
 | **M6** | Real-world GEFS v12 reforecast ingestion & IMD gridded observation pipeline | *Upcoming ⏳* |

@@ -11,6 +11,7 @@ import sys
 
 from akashnetra.config import load_config
 from akashnetra.logging_setup import setup_logging
+from akashnetra.models.train import run_training
 from akashnetra.processing.dataset import build_dataset
 
 logger = logging.getLogger("run_demo")
@@ -27,6 +28,8 @@ def main() -> int:
     result = build_dataset(cfg)
     logger.info("Demo dataset ready: %s", result.table_path)
     logger.info("Bust thresholds (train years only): %s", result.thresholds_path)
+    trained = run_training(cfg)
+    logger.info("Demo models trained. Metrics (SYNTHETIC): %s", trained.metrics_path)
     return 0
 
 
